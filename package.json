@@ -2,7 +2,10 @@
   "name": "atril",
   "private": true,
   "version": "1.0.0",
+  "description": "Atril: gestión de partituras de orquesta con OMR, transposición y audio.",
+  "author": "josegacia2748-dotcom",
   "type": "module",
+  "main": "electron/main.cjs",
   "engines": {
     "node": ">=20.19"
   },
@@ -11,9 +14,21 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --port 4180",
     "test": "vitest run",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "cap:sync": "npm run build && cap sync android",
+    "cap:open": "cap open android",
+    "android": "npm run cap:sync && cap open android",
+    "android:apk": "npm run cap:sync && node scripts/android-apk.mjs",
+    "electron:dev": "node scripts/electron-dev.mjs",
+    "electron:build": "npm run build && electron-builder --win nsis",
+    "electron:build:portable": "npm run build && electron-builder --win portable",
+    "electron:build:dir": "npm run build && electron-builder --win --dir"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
     "jspdf": "^3.0.3",
     "opensheetmusicdisplay": "^1.9.5",
     "pdfjs-dist": "^5.4.394",
@@ -22,11 +37,48 @@
     "tone": "^15.1.22"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
     "typescript": "^5.9.3",
     "vite": "^8.3.5",
     "vitest": "^3.2.4"
+  },
+  "build": {
+    "appId": "com.jgarapps.atril",
+    "productName": "Atril",
+    "copyright": "Copyright © 2026 Atril",
+    "asar": true,
+    "npmRebuild": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "${productName}-${version}-setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Atril",
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    }
   }
 }

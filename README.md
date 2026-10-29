@@ -87,6 +87,8 @@ Las claves de sol, fa y do (3.ª y 4.ª) se interpretan de forma independiente p
 | Audio | `tone` (PolySynth + Transport) |
 | PDF generado | `jspdf` |
 | Persistencia | `localStorage` (metadatos) + IndexedDB (PDFs) |
+| Android | Capacitor 8 (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`) |
+| Escritorio | Electron 45 + electron-builder 26 (Windows) |
 | Tests | Vitest |
 
 ---
@@ -113,6 +115,42 @@ npm run smoke -- http://localhost:4180/
 
 ---
 
+## Android (APK) y escritorio (Windows)
+
+El mismo código se empaqueta con **Capacitor** (Android) y **Electron** (Windows) sin cambiar la app web.
+
+### Android
+
+Requisitos: Android Studio con JDK 21+ y Android SDK 36.
+
+```bash
+npm run cap:sync      # build + copia dist/ al proyecto Android
+npm run android       # build + abre Android Studio
+npm run android:apk   # build + compila el APK de depuración con Gradle
+```
+
+- Proyecto nativo en `android/` (paquete `com.jgarapps.atril`).
+- En Android Studio: **Build → Build Bundle(s)/APK(s) → Build APK(s)**. El APK queda en `android/app/build/outputs/apk/debug/`.
+- Para publicar: **Build → Generate Signed Bundle/APK**.
+- `AndroidManifest.xml` declara `INTERNET` y los permisos de almacenamiento heredados (Android ≤ 10). En Android 11+ los PDFs y respaldos se guardan en la carpeta de la app y se ofrecen con el selector del sistema (Descargas, Drive, WhatsApp…).
+- La interfaz usa `viewport-fit=cover` y `env(safe-area-inset-*)`, por lo que respeta notch, bordes curvos y barras de gestos de Samsung, Xiaomi, Motorola, etc.
+
+### Windows
+
+```bash
+npm run electron:dev            # Vite + Electron en caliente
+npm run electron:build          # instalador NSIS en release/
+npm run electron:build:portable # .exe portable en release/
+npm run electron:build:dir      # carpeta sin instalador (release/win-unpacked)
+```
+
+- La build se carga con un protocolo propio `app://bundle` (origen seguro), así que `localStorage`, IndexedDB y las descargas funcionan igual que en la web.
+- `contextIsolation: true`, `nodeIntegration: false` y `sandbox: true`.
+- Las descargas abren el diálogo de Windows y se guardan en Descargas por defecto.
+- La ventana principal mide 1360×900 (mínimo 1024×700) y usa un menú en español.
+
+---
+
 ## Estructura
 
 ```
@@ -134,8 +172,15 @@ src/
   pages/         Login, DirectorHome, Upload, Library, Musicians, Settings,
                  MusicianHome, ScorePage, NotFound
   styles.css     Sistema de diseño y responsive
+electron/
+  main.cjs       Proceso principal: ventana, protocolo app://bundle, menú, descargas
+  preload.cjs    Puente seguro con la interfaz (window.desktopApp)
+android/         Proyecto Android generado por Capacitor (APK)
+capacitor.config.ts  Identidad de la app Android (appId, webDir, scheme)
 scripts/
-  smoke.mjs      Prueba E2E con Edge headless y Chrome DevTools Protocol
+  smoke.mjs        Prueba E2E con Edge headless y Chrome DevTools Protocol
+  electron-dev.mjs Vite + Electron para desarrollo de escritorio
+  android-apk.mjs  Compila el APK de depuración con el wrapper de Gradle
 ```
 
 ---

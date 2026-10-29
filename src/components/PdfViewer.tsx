@@ -89,19 +89,21 @@ export function PdfViewer({ score }: { score: Score }) {
     }
   };
 
+  const pdfFilename = `${score.title.replace(/[^\w\- ]+/g, "").trim() || "partitura"}.pdf`;
+
   const onDownload = async () => {
     const target = await ensureGenerated();
-    if (target) downloadBlob(target, `${score.title.replace(/[^\w\- ]+/g, "").trim() || "partitura"}.pdf`);
+    if (target) downloadBlob(target, pdfFilename);
   };
 
   const onPrint = async () => {
     const target = await ensureGenerated();
-    if (target) printBlob(target);
+    if (target) printBlob(target, pdfFilename);
   };
 
   const onOpen = async () => {
     const target = await ensureGenerated();
-    if (target) openBlob(target);
+    if (target) openBlob(target, pdfFilename);
   };
 
   if (!score.pdfId) {

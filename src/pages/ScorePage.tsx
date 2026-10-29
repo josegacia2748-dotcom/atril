@@ -135,7 +135,7 @@ export function ScorePage({ id }: { id: string }) {
     setBusy(true);
     setError("");
     try {
-      printBlob(await fetchPdf());
+      printBlob(await fetchPdf(), `${filename}.pdf`);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo imprimir.");
     } finally {

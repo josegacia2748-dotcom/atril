@@ -4,7 +4,7 @@
 
 Atril es una aplicación web pública que permite al director subir partituras en PDF, revisarlas con un lector OMR, asignarlas por instrumento y compartirlas con los músicos de la orquesta. Cada músico entra a su atril, ve únicamente el material de su instrumento, lo lee, lo descarga, lo imprime y lo escucha con el timbre de su familia instrumental.
 
-- **Demo:** [atril.vercel.app](https://atril.vercel.app)
+- **Demo:** [atril-pi.vercel.app](https://atril-pi.vercel.app)
 - **Repositorio:** [github.com/josegacia2748-dotcom/atril](https://github.com/josegacia2748-dotcom/atril)
 
 ---
